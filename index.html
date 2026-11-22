@@ -276,10 +276,75 @@
     </div>
 
     <script>
+        let audioCtx = null;
+        let isMusicPlaying = false;
+
+        function playBirthdayMelody() {
+            if (isMusicPlaying) return;
+            isMusicPlaying = true;
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const notes = [
+                { freq: 392.00, dur: 0.35 }, { freq: 392.00, dur: 0.15 },
+                { freq: 440.00, dur: 0.50 }, { freq: 392.00, dur: 0.50 },
+                { freq: 523.25, dur: 0.50 }, { freq: 493.88, dur: 1.00 },
+
+                { freq: 392.00, dur: 0.35 }, { freq: 392.00, dur: 0.15 },
+                { freq: 440.00, dur: 0.50 }, { freq: 392.00, dur: 0.50 },
+                { freq: 587.33, dur: 0.50 }, { freq: 523.25, dur: 1.00 },
+
+                { freq: 392.00, dur: 0.35 }, { freq: 392.00, dur: 0.15 },
+                { freq: 783.99, dur: 0.50 }, { freq: 659.25, dur: 0.50 },
+                { freq: 523.25, dur: 0.50 }, { freq: 493.88, dur: 0.50 },
+                { freq: 440.00, dur: 1.00 },
+
+                { freq: 698.46, dur: 0.35 }, { freq: 698.46, dur: 0.15 },
+                { freq: 659.25, dur: 0.50 }, { freq: 523.25, dur: 0.50 },
+                { freq: 587.33, dur: 0.50 }, { freq: 523.25, dur: 1.20 }
+            ];
+
+            let time = audioCtx.currentTime + 0.05;
+
+            notes.forEach(note => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(note.freq, time);
+
+                gain.gain.setValueAtTime(0.001, time);
+                gain.gain.exponentialRampToValueAtTime(0.2, time + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + note.dur);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(time);
+                osc.stop(time + note.dur);
+
+                time += note.dur + 0.04;
+            });
+
+            const totalDuration = (time - audioCtx.currentTime) * 1000;
+            setTimeout(() => {
+                isMusicPlaying = false;
+                playBirthdayMelody();
+            }, totalDuration + 1500);
+        }
+
         function openEnvelope() {
             const envelope = document.getElementById('envelope');
             const openBtn = document.getElementById('openBtn');
             
+            playBirthdayMelody();
+
             envelope.classList.add('open');
             openBtn.disabled = true;
             openBtn.innerText = "Membuka...";
