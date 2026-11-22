@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habede Bur</title>
-    <!-- Menggunakan Google Fonts agar tampilan tulisan lebih estetik -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -33,11 +32,15 @@
             text-align: center;
             width: 90%;
             max-width: 500px;
-            animation: fadeIn 0.8s ease-in-out;
         }
 
         .slide.active {
             display: flex;
+        }
+
+        /* Animasi fadeIn hanya untuk Slide 2, 3, 4 agar Slide 1 tidak glitch saat dimuat */
+        #slide2.active, #slide3.active, #slide4.active {
+            animation: fadeIn 0.8s ease-in-out;
         }
 
         @keyframes fadeIn {
@@ -59,7 +62,6 @@
             align-items: center;
         }
 
-        /* Tutup Amplop (Segitiga Atas) */
         .flap {
             position: absolute;
             top: 0;
@@ -71,10 +73,11 @@
             border-top: 115px solid #ff4757;
             transform-origin: top;
             transition: transform 0.6s ease-in-out;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             z-index: 3;
         }
 
-        /* Saku Amplop (Samping & Bawah) */
         .pocket {
             position: absolute;
             bottom: 0;
@@ -89,7 +92,6 @@
             z-index: 2;
         }
 
-        /* Kertas Surat di dalam Amplop */
         .letter-preview {
             position: absolute;
             bottom: 10px;
@@ -113,7 +115,6 @@
             color: #ff4757;
         }
 
-        /* Animasi saat tombol Buka Amplop diklik */
         .envelope-wrapper.open .flap {
             transform: rotateX(180deg);
             z-index: 0;
@@ -123,14 +124,7 @@
             transform: translateY(-70px);
         }
 
-        .prompt-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            margin-bottom: 20px;
-        }
-
+        /* --- SLIDE 2, 3, & 4: KARTU UCAPAN --- */
         .card {
             background: rgba(255, 255, 255, 0.95);
             padding: 40px 30px;
@@ -167,23 +161,63 @@
 
         /* Pengaturan Foto di Slide 4 */
         .card-photo {
-    width: 100%;
-    max-width: 320px;
-    height: auto;
-    border-radius: 15px;
-    border: 4px solid #ff4757;
-    box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
-    margin-bottom: 15px;
-}
-        /* Menghilangkan glitch/kedip pada Slide 1 saat halaman baru dimuat */
-#slide1 {
-    animation: none;
-}
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            display: block;
+            margin: 0 auto 18px auto;
+            border-radius: 15px;
+            border: 4px solid #ff4757;
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+        }
 
-.flap {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-}`
+        /* Tombol */
+        .btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn:hover {
+            background: #ff6b81;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Efek Konfeti Sederhana */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            top: -10px;
+            z-index: 999;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(720deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -197,7 +231,6 @@
             </div>
             <div class="pocket"></div>
         </div>
-        <p class="prompt-text"></p>
         <button class="btn" id="openBtn" onclick="openEnvelope()">Buka</button>
     </div>
 
@@ -245,37 +278,30 @@
     </div>
 
     <script>
-        // Fungsi membuka amplop di Slide 1
         function openEnvelope() {
             const envelope = document.getElementById('envelope');
             const openBtn = document.getElementById('openBtn');
             
-            // Tambahkan class 'open' untuk memicu animasi CSS
             envelope.classList.add('open');
             openBtn.disabled = true;
             openBtn.innerText = "Membuka...";
 
-            // Tunggu animasi amplop selesai (1.2 detik), lalu pindah ke Slide 2
             setTimeout(() => {
                 goToSlide(2);
                 triggerConfetti();
             }, 1200);
         }
 
-        // Fungsi berpindah antar slide
         function goToSlide(slideNumber) {
-            // Sembunyikan semua slide
             const slides = document.querySelectorAll('.slide');
             slides.forEach(slide => slide.classList.remove('active'));
 
-            // Tampilkan slide yang dituju
             const targetSlide = document.getElementById('slide' + slideNumber);
             if (targetSlide) {
                 targetSlide.classList.add('active');
             }
         }
 
-        // Fungsi membuat efek konfeti jatuh
         function triggerConfetti() {
             const colors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ff6b81', '#eccc68'];
             
@@ -283,20 +309,15 @@
                 const confetti = document.createElement('div');
                 confetti.classList.add('confetti');
                 
-                // Posisi horizontal acak
                 confetti.style.left = Math.random() * 100 + 'vw';
-                // Warna acak
                 confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                // Ukuran acak
                 const size = Math.random() * 8 + 6 + 'px';
                 confetti.style.width = size;
                 confetti.style.height = size;
-                // Durasi jatuh acak
                 confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
                 
                 document.body.appendChild(confetti);
 
-                // Hapus elemen konfeti setelah animasi selesai agar tidak memberatkan browser
                 setTimeout(() => {
                     confetti.remove();
                 }, 4000);
