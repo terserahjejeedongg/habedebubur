@@ -23,7 +23,6 @@
             color: #333;
         }
 
-        /* Kontainer Utama untuk setiap Slide */
         .slide {
             display: none;
             flex-direction: column;
@@ -38,7 +37,6 @@
             display: flex;
         }
 
-        /* Animasi fadeIn hanya untuk Slide 2, 3, 4 agar Slide 1 tidak glitch saat dimuat */
         #slide2.active, #slide3.active, #slide4.active {
             animation: fadeIn 0.8s ease-in-out;
         }
@@ -202,7 +200,7 @@
             justify-content: center;
         }
 
-        /* Efek Konfeti Sederhana */
+        /* Efek Konfeti */
         .confetti {
             position: fixed;
             width: 10px;
